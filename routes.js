@@ -105,26 +105,25 @@ router.post('/user', async (req, res) => {
     }
 })
 
-router.post('/submit', async (req, res) => {
+router.post('/submit/:userID', async (req, res) => {
     try {
-        const user = await User.findById(req.body.userId);
+        const user = await User.find({ _id: req.params.userID });
         if (!user) {
             return res.status(404).json({ message: 'User not found' });
         }
 
         const submittedAnswers = req.body.answers;
-        const userAnswers = submittedAnswers.map(answer => answer.userAnswer);
+        // const userAnswers = submittedAnswers.map(answer => answer.userAnswer);
 
         const correctAnswers = await Question.find().select('correctOption');
         const correctAnswerIndices = correctAnswers.map(answer => answer.correctOption);
 
         let score = 0;
-        userAnswers.forEach((userAnswer, index) => {
+        submittedAnswers.forEach((userAnswer, index) => {
             if (userAnswer === correctAnswerIndices[index]) {
                 score++;
             }
         });
-
         user.score = score;
         await user.save();
 
