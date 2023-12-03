@@ -91,6 +91,19 @@ router.get('/', (req, res) => {
     res.send('H3ll0 W0RlD')
 })
 
+// create one user question
+router.post('/user', async (req, res) => {
+    try {
+        const { name, score } = req.body
+
+        const newUser = await User.create({
+            name, score
+        })
+        return res.status(201).json(newUser)
+    } catch (error) {
+        return res.status(500).json({ "error": error })
+    }
+})
 
 router.post('/submit', async (req, res) => {
     try {
@@ -102,8 +115,8 @@ router.post('/submit', async (req, res) => {
         const submittedAnswers = req.body.answers;
         const userAnswers = submittedAnswers.map(answer => answer.userAnswer);
 
-        const correctAnswers = await Question.find().select('correctAnswer');
-        const correctAnswerIndices = correctAnswers.map(answer => answer.correctAnswer);
+        const correctAnswers = await Question.find().select('correctOption');
+        const correctAnswerIndices = correctAnswers.map(answer => answer.correctOption);
 
         let score = 0;
         userAnswers.forEach((userAnswer, index) => {
